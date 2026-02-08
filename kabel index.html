@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#4472c4">
+    <title>ЭлектроКальк Pro</title>
+    <style>
+        :root {
+            --bg-body: #f1f5f9;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --input-bg: #f8fafc;
+            --border: #e2e8f0;
+            --accent: #4472c4;
+            --result-bg: #eff6ff;
+            --result-border: #dbeafe;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0f172a;
+                --bg-card: #1e293b;
+                --text-main: #f1f5f9;
+                --text-muted: #94a3b8;
+                --input-bg: #334155;
+                --border: #475569;
+                --accent: #60a5fa;
+                --result-bg: #1e3a8a33;
+                --result-border: #1e40af;
+            }
+        }
+
+        body { font-family: system-ui, -apple-system, sans-serif; background-color: var(--bg-body); color: var(--text-main); display: flex; justify-content: center; padding: 15px; margin: 0; transition: 0.3s; }
+        .calc-card { width: 100%; max-width: 440px; background: var(--bg-card); border-radius: 20px; padding: 24px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border: 1px solid var(--border); }
+        
+        .tabs { display: flex; background: var(--input-bg); border-radius: 12px; padding: 4px; margin-bottom: 24px; border: 1px solid var(--border); }
+        .tab { flex: 1; text-align: center; padding: 12px; font-size: 14px; font-weight: 600; cursor: pointer; border-radius: 10px; color: var(--text-muted); transition: 0.2s; }
+        .tab.active { background: var(--accent); color: white; }
+
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+        label { display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        select, input { 
+            width: 100%; padding: 14px; border: 2px solid var(--border); border-radius: 12px; 
+            background: var(--input-bg); color: var(--text-main); font-size: 16px; 
+            box-sizing: border-box; outline: none; -webkit-appearance: none;
+        }
+        select:focus, input:focus { border-color: var(--accent); }
+
+        .results-box { background: var(--result-bg); border: 1px solid var(--result-border); border-radius: 16px; padding: 20px; margin-top: 24px; }
+        .result-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); }
+        .result-row:last-child { border-bottom: none; }
+        .res-value { font-weight: 800; color: var(--accent); font-size: 17px; }
+
+        #safety-note { 
+            margin-top: 15px; font-size: 13px; color: #f59e0b; padding: 12px; 
+            background: rgba(245, 158, 11, 0.1); border-radius: 10px; border-left: 4px solid #f59e0b; 
+            display: none; 
+        }
+
+        .btn-reset { width: 100%; margin-top: 20px; padding: 12px; background: transparent; border: 1px solid var(--border); color: var(--text-muted); border-radius: 10px; font-size: 13px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="calc-card">
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab(this, 'power')">Мощность</div>
+        <div class="tab" onclick="switchTab(this, 'current')">Ток</div>
+        <div class="tab" onclick="switchTab(this, 'size')">Сечение</div>
+    </div>
+
+    <div class="grid">
+        <div>
+            <label>Способ</label>
+            <select id="type">
+                <option value="hidden">Скрытая</option>
+                <option value="open">Открытая</option>
+            </select>
+        </div>
+        <div>
+            <label>Материал</label>
+            <select id="material">
+                <option value="cu">Медь (Cu)</option>
+                <option value="al">Алюминий (Al)</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="full-width" style="margin-bottom: 16px;">
+        <label id="main-label">Мощность (кВт)</label>
+        <input type="number" id="main-input" value="3.5" step="0.1" inputmode="decimal" onfocus="this.select()">
+    </div>
+
+    <div class="grid">
+        <div>
+            <label>U (Вольт)</label>
+            <select id="voltage">
+                <option value="220">220 В</option>
+                <option value="380">380 В</option>
+            </select>
+        </div>
+        <div>
+            <label>Длина (м)</label>
+            <input type="number" id="length" value="10" inputmode="numeric" onfocus="this.select()">
+        </div>
+    </div>
+
+    <div class="results-box">
+        <div class="result-row">
+            <span class="res-label">Сечение:</span>
+            <span class="res-value" id="res-s">-</span>
+        </div>
+        <div class="result-row">
+            <span class="res-label">Ток нагрузки:</span>
+            <span class="res-value" id="res-i">-</span>
+        </div>
+        <div class="result-row">
+            <span class="res-label">Автомат:</span>
+            <span class="res-value" id="res-breaker">-</span>
+        </div>
+        <div class="result-row" style="border: none;">
+            <span class="res-label">Потери U:</span>
+            <span class="res-value" id="res-loss">0.00%</span>
+        </div>
+        <div id="safety-note"></div>
+    </div>
+
+    <button class="btn-reset" onclick="resetCalc()">Сбросить расчет</button>
+</div>
+
+<script>
+    let currentMode = 'power';
+
+    function switchTab(el, mode) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+        currentMode = mode;
+        
+        const label = document.getElementById('main-label');
+        const input = document.getElementById('main-input');
+        
+        if(mode === 'power') { label.innerText = 'Мощность (кВт)'; input.value = "3.5"; }
+        else if(mode === 'current') { label.innerText = 'Ток (Ампер)'; input.value = "16"; }
+        else { label.innerText = 'Желаемое сечение (мм²)'; input.value = "2.5"; }
+        
+        calculate();
+    }
+
+    function calculate() {
+        const val = parseFloat(document.getElementById('main-input').value) || 0;
+        const volt = parseInt(document.getElementById('voltage').value);
+        const material = document.getElementById('material').value;
+        const type = document.getElementById('type').value;
+        const length = parseFloat(document.getElementById('length').value) || 0;
+
+        let I = 0;
+        if (currentMode === 'power') {
+            I = (volt === 220) ? (val * 1000) / volt : (val * 1000) / (volt * 1.732 * 0.9);
+        } else if (currentMode === 'current') {
+            I = val;
+        } else {
+            I = 16; 
+        }
+
+        const cuSteps = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50];
+        const cuCurrents = type === 'hidden' ? [15, 21, 27, 34, 50, 80, 115, 135, 175] : [19, 27, 38, 46, 70, 100, 140, 170, 215];
+        const alSteps = [2.5, 4, 6, 10, 16, 25, 35, 50];
+        const alCurrents = type === 'hidden' ? [16, 21, 26, 38, 55, 75, 90, 115] : [20, 28, 36, 50, 75, 105, 130, 165];
+
+        let steps = material === 'cu' ? cuSteps : alSteps;
+        let currents = material === 'cu' ? cuCurrents : alCurrents;
+        
+        let S = currentMode === 'size' ? val : steps[steps.length - 1];
+        
+        if (currentMode !== 'size') {
+            for (let i = 0; i < currents.length; i++) {
+                if (currents[i] >= I) { S = steps[i]; break; }
+            }
+        }
+
+        const breakers = [6, 10, 16, 20, 25, 32, 40, 50, 63, 80, 100];
+        let breaker = breakers.find(b => b >= I) || '—';
+
+        const rho = material === 'cu' ? 0.0175 : 0.028;
+        const loss = (2 * I * length * rho) / S;
+        const lossPercent = (loss / volt) * 100;
+
+        document.getElementById('res-i').innerText = I.toFixed(1) + ' А';
+        document.getElementById('res-s').innerText = S + ' мм²';
+        document.getElementById('res-breaker').innerText = breaker + ' А';
+        document.getElementById('res-loss').innerText = (isNaN(lossPercent) ? 0 : lossPercent).toFixed(2) + '%';
+
+        const note = document.getElementById('safety-note');
+        if (lossPercent > 5) {
+            note.style.display = 'block';
+            note.innerText = '⚠️ Потери напряжения > 5%. Рекомендуется увеличить сечение.';
+        } else {
+            note.style.display = 'none';
+        }
+    }
+
+    function resetCalc() {
+        document.getElementById('main-input').value = "3.5";
+        document.getElementById('length').value = "10";
+        calculate();
+    }
+
+    document.querySelectorAll('input, select').forEach(el => {
+        el.addEventListener('input', calculate);
+    });
+
+    calculate();
+</script>
+</body>
+</html>
