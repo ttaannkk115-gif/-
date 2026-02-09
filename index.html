@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToolBox Электрика PRO</title>
+    <title>Master ToolBox Ultra</title>
     <style>
         :root {
             --bg: #121212;
             --card: #1e1e1e;
             --accent: #ff9800;
+            --accent-blue: #00bcd4;
+            --accent-purple: #9c27b0;
+            --accent-pink: #e91e63;
             --text: #e0e0e0;
             --input-bg: #2c2c2c;
         }
@@ -18,230 +21,255 @@
             background-color: var(--bg);
             color: var(--text);
             margin: 0;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+            padding: 10px;
         }
 
-        h2 { 
-            color: var(--accent); 
-            font-size: 1.1rem; 
-            border-bottom: 1px solid #333; 
-            padding-bottom: 8px; 
-            margin: 0 0 15px 0;
+        /* Навигация */
+        .tabs {
+            display: flex;
+            background: var(--card);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            padding: 5px;
+            position: sticky;
+            top: 5px;
+            z-index: 100;
+            overflow-x: auto;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            -webkit-overflow-scrolling: touch;
         }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 12px 5px;
+            border: none;
+            background: none;
+            color: #888;
+            font-size: 0.7rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 8px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active { background: var(--accent); color: #000; }
+
+        .content { display: none; }
+        .content.active { display: block; animation: fadeIn 0.2s; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .card {
             background: var(--card);
-            border-radius: 12px;
+            border-radius: 15px;
             padding: 18px;
+            margin-bottom: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
 
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        label { display: block; font-size: 0.75rem; margin-bottom: 5px; color: #888; }
+        h2 { color: var(--accent); font-size: 1rem; margin: 0 0 15px 0; border-bottom: 1px solid #333; padding-bottom: 8px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        label { display: block; font-size: 0.7rem; color: #888; margin-bottom: 4px; }
+        input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: var(--input-bg); color: white; box-sizing: border-box; font-size: 1rem; }
+        button.main-btn { width: 100%; padding: 14px; background: var(--accent); border: none; border-radius: 8px; font-weight: bold; margin-top: 10px; cursor: pointer; color: #000; }
         
-        input, select {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #333;
-            background: var(--input-bg);
-            color: white;
-            box-sizing: border-box;
-            font-size: 1rem;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        button {
-            flex: 2;
-            padding: 12px;
-            background: var(--accent);
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            color: #000;
-        }
-
-        button.secondary { flex: 1; background: #333; color: #ccc; }
-
-        /* Стили таблицы */
-        .table-container { overflow-x: auto; margin-top: 10px; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 10px; }
         th, td { padding: 10px 5px; text-align: center; border-bottom: 1px solid #333; }
-        th { color: var(--accent); font-weight: normal; }
-        tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+        th { color: var(--accent); }
 
-        .controls {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
+        .res-box { margin-top: 15px; padding: 15px; border-radius: 8px; text-align: center; display: none; }
+        .ok { border: 1px solid #4caf50; color: #4caf50; background: rgba(76,175,80,0.1); }
+        .warn { border: 1px solid #f44336; color: #f44336; background: rgba(244,67,54,0.1); }
+        .hint { font-size: 0.7rem; color: #777; margin-top: 10px; line-height: 1.3; }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h2>⚡ Закон Ома</h2>
-        <div class="grid">
-            <div class="input-group">
-                <label>Напряжение (U, В)</label>
-                <input type="number" id="voltage" placeholder="220">
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab(event, 'breaker')">Автомат</button>
+        <button class="tab-btn" onclick="openTab(event, 'ohm')">Ом</button>
+        <button class="tab-btn" onclick="openTab(event, 'wires')">Сечение</button>
+        <button class="tab-btn" onclick="openTab(event, 'loss')">Потери</button>
+        <button class="tab-btn" onclick="openTab(event, 'motor')">Мотор</button>
+        <button class="tab-btn" onclick="openTab(event, 'light')">Свет/IP</button>
+    </div>
+
+    <div id="breaker" class="content active">
+        <div class="card">
+            <h2>🛡️ Подбор автомата (АВ)</h2>
+            <div class="grid">
+                <div>
+                    <label>Мощность (Вт)</label>
+                    <input type="number" id="b_p" placeholder="3500">
+                </div>
+                <div>
+                    <label>Сеть</label>
+                    <select id="b_v">
+                        <option value="220">220В (1ф)</option>
+                        <option value="380">380В (3ф)</option>
+                    </select>
+                </div>
             </div>
-            <div class="input-group">
-                <label>Ток (I, А)</label>
-                <input type="number" id="current" placeholder="10">
+            <button class="main-btn" onclick="calcBreaker()" style="background:var(--accent-blue);">Рассчитать номинал</button>
+            <div id="b_res" class="res-box ok">
+                <div style="font-size:0.8rem; opacity:0.8;">Ток нагрузки: <span id="b_i_real">0</span> А</div>
+                <div style="font-size:1.3rem; font-weight:bold; margin: 5px 0;">АВ: <span id="b_i_std">--</span></div>
+                <div class="hint" id="b_hint"></div>
             </div>
-            <div class="input-group">
-                <label>Сопротивление (R, Ом)</label>
-                <input type="number" id="res">
-            </div>
-            <div class="input-group">
-                <label>Мощность (P, Вт)</label>
-                <input type="number" id="power">
-            </div>
-        </div>
-        <div class="button-group">
-            <button onclick="calcOhm()">Рассчитать</button>
-            <button class="secondary" onclick="clearOhm()">Очистить</button>
         </div>
     </div>
 
-    <div class="card">
-        <h2>🔌 Подбор сечения кабеля</h2>
-        
-        <div class="controls">
-            <div>
-                <label>Тип прокладки</label>
-                <select id="mountType" onchange="renderTable()">
-                    <option value="open">Открытая</option>
-                    <option value="hidden">Скрытая</option>
-                </select>
+    <div id="ohm" class="content">
+        <div class="card">
+            <h2>⚡ Закон Ома</h2>
+            <div class="grid">
+                <div><label>U (Вольт)</label><input type="number" id="o_u"></div>
+                <div><label>I (Ампер)</label><input type="number" id="o_i"></div>
+                <div><label>R (Ом)</label><input type="number" id="o_r"></div>
+                <div><label>P (Ватт)</label><input type="number" id="o_p"></div>
             </div>
-            <div>
-                <label>Материал жилы</label>
-                <select id="material" onchange="renderTable()">
-                    <option value="cu">Медь (Cu)</option>
-                    <option value="al">Алюминий (Al)</option>
-                </select>
-            </div>
-            <div>
-                <label>Напряжение</label>
-                <select id="voltType" onchange="renderTable()">
-                    <option value="220">220 В</option>
-                    <option value="380">380 В</option>
-                </select>
-            </div>
+            <button class="main-btn" onclick="calcOhm()">Рассчитать</button>
         </div>
+    </div>
 
-        <div class="table-container">
-            <table id="wireTable">
-                <thead>
-                    <tr>
-                        <th>мм²</th>
-                        <th>Ток (А)</th>
-                        <th>Мощн. (кВт)</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    </tbody>
+    <div id="wires" class="content">
+        <div class="card">
+            <h2>🔌 Подбор кабеля</h2>
+            <select id="w_mount" onchange="renderTable()" style="margin-bottom:10px;">
+                <option value="open">Открытая прокладка</option>
+                <option value="hidden">Скрытая прокладка</option>
+            </select>
+            <div class="grid">
+                <select id="w_mat" onchange="renderTable()"><option value="cu">Медь</option><option value="al">Алюм.</option></select>
+                <select id="w_volt" onchange="renderTable()"><option value="220">220В</option><option value="380">380В</option></select>
+            </div>
+            <table>
+                <thead><tr><th>мм²</th><th>Ток (А)</th><th>P (кВт)</th></tr></thead>
+                <tbody id="w_body"></tbody>
             </table>
         </div>
     </div>
 
+    <div id="loss" class="content">
+        <div class="card">
+            <h2>📉 Потери напряжения</h2>
+            <label>Мощность (Вт)</label><input type="number" id="l_p" placeholder="3000" style="margin-bottom:10px;">
+            <label>Длина (метров)</label><input type="number" id="l_l" placeholder="50" style="margin-bottom:10px;">
+            <div class="grid">
+                <select id="l_s"><option value="1.5">1.5</option><option value="2.5" selected>2.5</option><option value="4">4.0</option><option value="6">6.0</option></select>
+                <select id="l_m"><option value="0.0175">Медь</option><option value="0.028">Алюм.</option></select>
+            </div>
+            <button class="main-btn" onclick="calcLoss()" style="background:var(--accent-blue);">Рассчитать %</button>
+            <div id="l_res" class="res-box">
+                <div id="l_val" style="font-size:1.4rem; font-weight:bold;"></div>
+                <div id="l_txt"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="motor" class="content">
+        <div class="card">
+            <h2>🌀 Пуск 3Ф мотора в 220В</h2>
+            <label>Мощность (кВт)</label><input type="number" id="m_p" placeholder="2.2" step="0.1">
+            <label style="margin-top:10px;">Схема</label>
+            <select id="m_type"><option value="delta" selected>Треугольник (Δ)</option><option value="star">Звезда (Y)</option></select>
+            <button class="main-btn" onclick="calcMotor()" style="background:var(--accent-purple); color:#fff;">Рассчитать мкФ</button>
+            <div id="m_res" class="res-box ok">
+                <div>Рабочий: <b id="m_crab"></b></div>
+                <div>Пусковой: <b id="m_cpusk"></b></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="light" class="content">
+        <div class="card">
+            <h2>💡 Освещенность</h2>
+            <div class="grid">
+                <div><label>Площадь (м²)</label><input type="number" id="li_a" placeholder="20"></div>
+                <div><label>Тип</label><select id="li_t"><option value="150">Жилая</option><option value="300">Офис</option><option value="50">Холл</option></select></div>
+            </div>
+            <button class="main-btn" onclick="calcLight()" style="background:var(--accent-pink); color:#fff;">Найти Люмены</button>
+            <div id="li_res" class="res-box ok"><div id="li_v" style="font-size:1.2rem; font-weight:bold;"></div></div>
+        </div>
+        <div class="card">
+            <h2>🛡️ Степень защиты IP</h2>
+            <div class="grid">
+                <select id="ip1" onchange="updateIP()"><option value="0">IP 0x</option><option value="2">IP 2x</option><option value="4">IP 4x</option><option value="5">IP 5x</option><option value="6" selected>IP 6x</option></select>
+                <select id="ip2" onchange="updateIP()"><option value="0">IP x0</option><option value="1">IP x1</option><option value="4">IP x4</option><option value="7" selected>IP x7</option><option value="8">IP x8</option></select>
+            </div>
+            <div id="ip_desc" class="hint" style="text-align:center; color:var(--accent-blue); font-weight:bold;"></div>
+        </div>
+    </div>
+
     <script>
-        // Данные из ваших таблиц
-        const data = {
-            open: {
-                cu: {
-                    s: [0.5, 0.75, 1.0, 1.5, 2.0, 2.5, 4.0, 6.0, 10.0, 16.0, 25.0],
-                    i: [11, 15, 17, 23, 26, 30, 41, 50, 80, 100, 140],
-                    p220: [2.4, 3.3, 3.7, 5.0, 5.7, 6.6, 9.0, 11.0, 17.0, 22.0, 30.0],
-                    p380: [0, 0, 6.4, 8.7, 9.8, 11.0, 15.0, 19.0, 30.0, 38.0, 53.0]
-                },
-                al: {
-                    s: [2.0, 2.5, 4.0, 6.0, 10.0, 16.0, 25.0],
-                    i: [21, 24, 32, 39, 60, 75, 100],
-                    p220: [4.6, 5.2, 7.0, 8.5, 13.0, 16.0, 23.0],
-                    p380: [7.9, 9.1, 12.0, 14.0, 22.0, 28.0, 39.0]
-                }
-            },
-            hidden: {
-                cu: {
-                    s: [1.0, 1.5, 2.0, 2.5, 4.0, 6.0, 10.0, 16.0, 25.0, 35.0],
-                    i: [14, 15, 19, 21, 27, 34, 50, 80, 100, 135],
-                    p220: [3.0, 3.3, 4.1, 4.6, 5.9, 7.7, 11.0, 17.0, 22.0, 29.0],
-                    p380: [5.3, 5.7, 7.2, 7.9, 10.0, 12.0, 19.0, 30.0, 38.0, 51.0]
-                },
-                al: {
-                    s: [2.0, 2.5, 4.0, 6.0, 10.0, 16.0, 25.0, 35.0],
-                    i: [14, 16, 21, 26, 38, 55, 65, 75],
-                    p220: [3.0, 3.5, 4.6, 5.7, 8.3, 12.0, 14.0, 16.0],
-                    p380: [5.3, 6.0, 7.9, 9.8, 14.0, 20.0, 24.0, 28.0]
-                }
-            }
-        };
+        function openTab(e, t) {
+            let c = document.getElementsByClassName("content"), b = document.getElementsByClassName("tab-btn");
+            for (let i=0; i<c.length; i++) c[i].classList.remove("active"), b[i].classList.remove("active");
+            document.getElementById(t).classList.add("active"); e.currentTarget.classList.add("active");
+            if(t==='wires') renderTable(); if(t==='light') updateIP();
+        }
 
-        function renderTable() {
-            const mount = document.getElementById('mountType').value;
-            const mat = document.getElementById('material').value;
-            const volt = document.getElementById('voltType').value;
-            const body = document.getElementById('tableBody');
+        // Логика подбора Автомата
+        function calcBreaker() {
+            const p = parseFloat(document.getElementById('b_p').value);
+            const v = parseFloat(document.getElementById('b_v').value);
+            if (!p) return;
+            let i = (v == 220) ? (p / v) : (p / (v * 1.732 * 0.9));
+            const target = i * 1.25; // Коэффициент 1.25
+            const ratings = [6, 10, 16, 20, 25, 32, 40, 50, 63, 80, 100];
+            const std = ratings.find(r => r >= target) || "Более 100А";
             
-            const selected = data[mount][mat];
-            let html = '';
-
-            selected.s.forEach((val, index) => {
-                const power = volt === '220' ? selected.p220[index] : selected.p380[index];
-                if (power === 0) return; // Пропуск пустых значений для 380В
-
-                html += `<tr>
-                    <td><b>${val}</b></td>
-                    <td>${selected.i[index]}</td>
-                    <td>${power}</td>
-                </tr>`;
-            });
-            body.innerHTML = html;
+            document.getElementById('b_res').style.display = 'block';
+            document.getElementById('b_i_real').innerText = i.toFixed(2);
+            document.getElementById('b_i_std').innerText = std + (typeof std === 'number' ? ' Ампер' : '');
+            document.getElementById('b_hint').innerText = `Запас 25% учтен. Убедитесь, что сечение кабеля соответствует автомату!`;
         }
 
         function calcOhm() {
-            let u = parseFloat(document.getElementById('voltage').value);
-            let i = parseFloat(document.getElementById('current').value);
-            let r = parseFloat(document.getElementById('res').value);
-            let p = parseFloat(document.getElementById('power').value);
-
-            if (u && i) { r = u/i; p = u*i; }
-            else if (u && r) { i = u/r; p = u*u/r; }
-            else if (u && p) { i = p/u; r = u*u/p; }
-            else if (i && r) { u = i*r; p = i*i*r; }
-            else if (i && p) { u = p/i; r = p/(i*i); }
-            else if (r && p) { u = Math.sqrt(p*r); i = Math.sqrt(p/r); }
-
-            if(u) document.getElementById('voltage').value = u.toFixed(1);
-            if(i) document.getElementById('current').value = i.toFixed(2);
-            if(r) document.getElementById('res').value = r.toFixed(2);
-            if(p) document.getElementById('power').value = p.toFixed(1);
+            let u=parseFloat(document.getElementById('o_u').value), i=parseFloat(document.getElementById('o_i').value), r=parseFloat(document.getElementById('o_r').value), p=parseFloat(document.getElementById('o_p').value);
+            if(u && i){r=u/i; p=u*i} else if(u && r){i=u/r; p=u*u/r} else if(i && r){u=i*r; p=i*i*r} else if(p && u){i=p/u; r=u*u/p}
+            if(u) document.getElementById('o_u').value=u.toFixed(1); if(i) document.getElementById('o_i').value=i.toFixed(2); if(r) document.getElementById('o_r').value=r.toFixed(1); if(p) document.getElementById('o_p').value=p.toFixed(0);
         }
 
-        function clearOhm() {
-            ['voltage','current','res','power'].forEach(id => document.getElementById(id).value = '');
+        const wireData = {
+            open: { cu:{s:[1.5,2.5,4,6,10], i:[23,30,41,50,80], p220:[5,6.6,9,11,17], p380:[8.7,11,15,19,30]}, al:{s:[2.5,4,6,10,16], i:[24,32,39,60,75], p220:[5.2,7,8.5,13,16], p380:[9.1,12,14,22,28]} },
+            hidden: { cu:{s:[1.5,2.5,4,6,10], i:[15,21,27,34,50], p220:[3.3,4.6,5.9,7.7,11], p380:[5.7,7.9,10,12,19]}, al:{s:[2.5,4,6,10,16], i:[16,21,26,38,55], p220:[3.5,4.6,5.7,8.3,12], p380:[6,7.9,9.8,14,20]} }
+        };
+
+        function renderTable() {
+            const m=document.getElementById('w_mount').value, mat=document.getElementById('w_mat').value, v=document.getElementById('w_volt').value, db=wireData[m][mat];
+            let h=''; db.s.forEach((s,x)=>{ h+=`<tr><td>${s}</td><td>${db.i[x]}</td><td>${v=='220'?db.p220[x]:db.p380[x]}</td></tr>`; });
+            document.getElementById('w_body').innerHTML=h;
         }
 
-        // Инициализация таблицы при загрузке
-        renderTable();
+        function calcLoss() {
+            const p=parseFloat(document.getElementById('l_p').value), l=parseFloat(document.getElementById('l_l').value), s=parseFloat(document.getElementById('l_s').value), r=parseFloat(document.getElementById('l_m').value);
+            if(!p || !l) return; const dU = (p/220)*(r*2*l/s), dUP = (dU/220)*100, rb=document.getElementById('l_res');
+            rb.style.display='block'; rb.className='res-box '+(dUP>5?'warn':'ok');
+            document.getElementById('l_val').innerText=dUP.toFixed(2)+'%'; document.getElementById('l_txt').innerText=dUP>5?'Критично (>5%)':'В норме';
+        }
+
+        function calcMotor() {
+            const p=parseFloat(document.getElementById('m_p').value); if(!p) return;
+            const c=(document.getElementById('m_type').value==='delta')?p*70:p*45;
+            document.getElementById('m_res').style.display='block'; document.getElementById('m_crab').innerText=Math.round(c)+' мкФ'; document.getElementById('m_cpusk').innerText=Math.round(c*2.5)+' мкФ';
+        }
+
+        function calcLight() {
+            const a=parseFloat(document.getElementById('li_a').value), l=parseFloat(document.getElementById('li_t').value);
+            if(!a) return; document.getElementById('li_res').style.display='block';
+            document.getElementById('li_v').innerText=Math.round(a*l*1.2)+' Люмен';
+        }
+
+        function updateIP() {
+            const i1=document.getElementById('ip1').value, i2=document.getElementById('ip2').value;
+            const d1={'0':'Нет защ.','2':'От пальцев','4':'От проволоки','5':'Пыль','6':'Пыленепрон.'}, d2={'0':'нет защ.','1':'верт. капли','4':'брызги','7':'погружение','8':'давление'};
+            document.getElementById('ip_desc').innerText='IP'+i1+i2+': '+d1[i1]+' и '+d2[i2];
+        }
+
+        renderTable(); updateIP();
     </script>
 </body>
 </html>
