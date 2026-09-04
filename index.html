@@ -468,14 +468,14 @@
         <div class="title-block">
             <span class="title-text">Товарный чек №</span> 
             <div class="clear-wrapper">
-                <input type="text" id="doc-number" value="19053" placeholder="19053" oninput="syncPrintText(this); saveData()">
-                <div class="print-text">19053</div>
+                <input type="text" id="doc-number" value="" placeholder="19053" oninput="syncPrintText(this); saveData()">
+                <div class="print-text"></div>
                 <span class="clear-btn" onmousedown="clearInput(event, 'doc-number')">✕</span>
             </div>
             <span class="title-text">от</span> 
             <div class="clear-wrapper">
-                <input type="date" id="doc-date" value="2026-04-21" onchange="syncPrintText(this); saveData()">
-                <div class="print-text">2026-04-21</div>
+                <input type="date" id="doc-date" value="" onchange="syncPrintText(this); saveData()">
+                <div class="print-text"></div>
                 <span class="clear-btn" onmousedown="clearInput(event, 'doc-date')">✕</span>
             </div>
         </div>
@@ -491,8 +491,8 @@
                 <td class="info-label">Продавец:</td>
                 <td colspan="2">
                     <div class="clear-wrapper">
-                        <input type="text" class="info-input" id="seller" value="СНАБЖЕНЕЦ Махачкала" placeholder="ФИО / ИП / Компания" oninput="syncPrintText(this); saveData()">
-                        <div class="print-text">СНАБЖЕНЕЦ Махачкала</div>
+                        <input type="text" class="info-input" id="seller" value="" placeholder="ФИО / ИП / Компания" oninput="syncPrintText(this); saveData()">
+                        <div class="print-text"></div>
                         <span class="clear-btn" onmousedown="clearInput(event, 'seller')">✕</span>
                     </div>
                 </td>
@@ -501,15 +501,15 @@
                 <td class="info-label">Покупатель:</td>
                 <td>
                     <div class="clear-wrapper">
-                        <input type="text" class="info-input" id="buyer" value="Газимагомед электрик 89640040355-Z" placeholder="ФИО / Номер телефона" oninput="syncPrintText(this); saveData()">
-                        <div class="print-text">Газимагомед электрик 89640040355-Z</div>
+                        <input type="text" class="info-input" id="buyer" value="" placeholder="ФИО / Номер телефона" oninput="syncPrintText(this); saveData()">
+                        <div class="print-text"></div>
                         <span class="clear-btn" onmousedown="clearInput(event, 'buyer')">✕</span>
                     </div>
                 </td>
                 <td class="manager-cell" style="padding-left: 10px;">
                     <div class="clear-wrapper">
-                        <input type="text" class="manager-input" id="manager" value="Рамазан ст 89640082023" placeholder="Контакт / Менеджер" oninput="syncPrintText(this); checkEmptyManager(); saveData()">
-                        <div class="print-text" style="text-align: right;">Рамазан ст 89640082023</div>
+                        <input type="text" class="manager-input" id="manager" value="" placeholder="Контакт / Менеджер" oninput="syncPrintText(this); checkEmptyManager(); saveData()">
+                        <div class="print-text" style="text-align: right;"></div>
                         <span class="clear-btn" onmousedown="clearInput(event, 'manager')">✕</span>
                     </div>
                 </td>
@@ -558,14 +558,14 @@
     <div class="signatures-flex">
         <div class="sig-item">Отпустил 
             <div class="clear-wrapper">
-                <input type="text" class="sig-line-input" id="sig-off" oninput="syncPrintText(this)">
+                <input type="text" class="sig-line-input" id="sig-off" oninput="syncPrintText(this); saveData()">
                 <div class="print-text"></div>
                 <span class="clear-btn" onmousedown="clearInput(event, 'sig-off')">✕</span>
             </div>
         </div>
         <div class="sig-item">Получил 
             <div class="clear-wrapper">
-                <input type="text" class="sig-line-input" id="sig-rec" oninput="syncPrintText(this)">
+                <input type="text" class="sig-line-input" id="sig-rec" oninput="syncPrintText(this); saveData()">
                 <div class="print-text"></div>
                 <span class="clear-btn" onmousedown="clearInput(event, 'sig-rec')">✕</span>
             </div>
@@ -578,24 +578,17 @@
 </div>
 
 <script>
-    const STORAGE_KEY = 'novy_svet_receipt_data_v10';
+    const STORAGE_KEY = 'voltmaster_receipt_persistent_v1';
 
-    const defaultReceiptData = {
-        docNumber: '19053',
-        docDate: '2026-04-21',
-        seller: 'СНАБЖЕНЕЦ Махачкала',
-        buyer: 'Газимагомед электрик 89640040355-Z',
-        manager: 'Рамазан ст 89640082023',
-        items: [
-            { name: 'Коробка распределительная СП 100х100х50мм SchE IMT35122(72)', qty: '4', unit: 'шт', price: '82' },
-            { name: 'Распред коробка внутрен. Большая 9.5см черная (150шт)', qty: '8', unit: 'шт', price: '12' },
-            { name: 'Коробка установочная СП 68(65)х45 блочная (200шт)', qty: '41', unit: 'шт', price: '19' },
-            { name: 'Выключатель автоматический модульный 2п С 63А NB1-63 (R) CHINT 179668', qty: '1', unit: 'шт', price: '939' },
-            { name: 'Выключатель автоматический модульный 1п С 20А NB1-63 (R) CHINT 179618', qty: '6', unit: 'шт', price: '429' },
-            { name: 'Реле напряжения Welrok VI-63 Red с контролем тока', qty: '1', unit: 'шт', price: '3237' },
-            { name: 'Корпус пластиковый встраиваемый ЭРА COMFORT ЩРВ-П-12 IP40 прозрачная крышка белый (20)', qty: '1', unit: 'шт', price: '1150' },
-            { name: 'Розетка 1-м ОП Blanca 16A IP20 250В с заземл. без защ. шторок с изолир. пластиной антрацит SchE BLNRA010116', qty: '1', unit: 'шт', price: '302' }
-        ]
+    const defaultEmptyData = {
+        docNumber: '',
+        docDate: new Date().toISOString().split('T')[0],
+        seller: '',
+        buyer: '',
+        manager: '',
+        sigOff: '',
+        sigRec: '',
+        items: []
     };
 
     function syncPrintText(input) {
@@ -616,6 +609,7 @@
             syncPrintText(input);
             input.dispatchEvent(new Event('input', { bubbles: true }));
             input.focus();
+            saveData();
         }
     }
 
@@ -823,15 +817,19 @@
             seller: document.getElementById('seller').value,
             buyer: document.getElementById('buyer').value,
             manager: document.getElementById('manager').value,
+            sigOff: document.getElementById('sig-off').value,
+            sigRec: document.getElementById('sig-rec').value,
             items: items
         };
     }
 
     function applyFormData(data) {
-        document.getElementById('doc-number').value = data.docNumber || '';
+        document.getElementById('doc-number').value = data.docNumber !== undefined ? data.docNumber : '';
         document.getElementById('seller').value = data.seller || '';
         document.getElementById('buyer').value = data.buyer || '';
         document.getElementById('manager').value = data.manager || '';
+        document.getElementById('sig-off').value = data.sigOff || '';
+        document.getElementById('sig-rec').value = data.sigRec || '';
         document.getElementById('doc-date').value = data.docDate || new Date().toISOString().split('T')[0];
 
         syncPrintText(document.getElementById('doc-number'));
@@ -839,6 +837,8 @@
         syncPrintText(document.getElementById('buyer'));
         syncPrintText(document.getElementById('manager'));
         syncPrintText(document.getElementById('doc-date'));
+        syncPrintText(document.getElementById('sig-off'));
+        syncPrintText(document.getElementById('sig-rec'));
 
         checkEmptyManager();
 
@@ -859,21 +859,20 @@
         setupClearButtons();
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
-            try { applyFormData(JSON.parse(saved)); } catch (e) { applyFormData(defaultReceiptData); }
+            try { 
+                applyFormData(JSON.parse(saved)); 
+            } catch (e) { 
+                applyFormData(defaultEmptyData); 
+            }
         } else {
-            applyFormData(defaultReceiptData);
+            applyFormData(defaultEmptyData);
         }
     }
 
     function resetForm() {
-        if (confirm('Очистить список товаров?')) {
-            document.getElementById('doc-number').value = '';
-            document.getElementById('doc-date').valueAsDate = new Date();
-            document.getElementById('manager').value = '';
-            checkEmptyManager();
-            document.getElementById('items-body').innerHTML = '';
-            addRow('', '', 'шт', '');
-            calculateTotal();
+        if (confirm('Очистить форму и сбросить все сохраненные данные?')) {
+            localStorage.removeItem(STORAGE_KEY);
+            applyFormData(defaultEmptyData);
             saveData();
         }
     }
