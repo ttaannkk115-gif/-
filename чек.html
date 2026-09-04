@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Товарный чек № 19053 - СНАБЖЕНЕЦ</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Arial', 'Helvetica', sans-serif;
+        }
+
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 10px 5px;
+            color: #000;
+        }
+
+        .receipt-card {
+            width: 100%;
+            max-width: 850px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 20px 15px 15px 15px;
+            border-radius: 4px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        @media (min-width: 600px) {
+            body {
+                padding: 15px;
+            }
+            .receipt-card {
+                padding: 25px 30px;
+            }
+        }
+
+        .clear-wrapper {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .clear-btn {
+            position: absolute;
+            right: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            background: #ccc;
+            color: #fff;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            cursor: pointer;
+            user-select: none;
+            z-index: 5;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .clear-btn:hover {
+            background: #e74c3c;
+        }
+
+        .header-section {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding-top: 10px;
+            padding-right: 10px;
+        }
+
+        .title-block {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            max-width: 100%;
+            border-bottom: 2px solid #000;
+            padding-bottom: 4px;
+            flex-grow: 1;
+        }
+
+        .title-text {
+            white-space: nowrap;
+        }
+
+        .title-block .clear-wrapper {
+            width: auto;
+        }
+
+        .title-block input[type="text"] {
+            font-size: 16px;
+            font-weight: bold;
+            width: 70px;
+            border: none;
+            border-bottom: 1px dashed #999;
+            padding: 0 18px 0 2px;
+            text-align: center;
+            font-family: inherit;
+        }
+
+        .title-block input[type="date"] {
+            font-size: 14px;
+            font-weight: bold;
+            border: none;
+            border-bottom: 1px dashed #999;
+            padding: 0 18px 0 2px;
+            max-width: 145px;
+            font-family: inherit;
+        }
+
+        .logo-block {
+            font-family: 'Arial', sans-serif;
+            color: #000;
+            position: relative;
+            display: inline-block;
+        }
+
+        .info-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        .info-table {
+            width: 100%;
+            font-size: 13px;
+            border-collapse: collapse;
+        }
+
+        .info-table td {
+            padding: 4px 0;
+            vertical-align: middle;
+        }
+
+        .info-label {
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            font-size: 13px;
+            font-weight: bold;
+            color: #000;
+            width: 90px;
+            white-space: nowrap;
+            padding-right: 5px;
+        }
+
+        .info-input {
+            width: 100%;
+            border: 1px solid #ccc;
+            padding: 5px 22px 5px 6px;
+            font-size: 13px;
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            font-weight: bold;
+            color: #000;
+            border-radius: 2px;
+        }
+
+        .manager-input {
+            border: 1px dashed #ccc;
+            padding: 5px 22px 5px 8px;
+            font-size: 13px;
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            font-weight: bold;
+            color: #000;
+            text-align: right;
+            width: 100%;
+            border-radius: 2px;
+            box-sizing: border-box;
+        }
+
+        .manager-input:focus {
+            outline: 1px solid #0056b3;
+            background: #fff;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            margin-bottom: 10px;
+            -webkit-overflow-scrolling: touch;
+            border: 1px solid #000;
+        }
+
+        table.items-table {
+            width: 100%;
+            min-width: 550px;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        table.items-table th, 
+        table.items-table td {
+            border: 1px solid #000;
+            padding: 4px 5px;
+            vertical-align: middle;
+        }
+
+        table.items-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .col-num { width: 28px; text-align: center; }
+        .col-qty { width: 75px; }
+        .col-price { width: 65px; }
+        .col-sum { width: 80px; }
+        .col-remove { width: 28px; text-align: center; border: none !important; }
+
+        .items-table input {
+            border: none;
+            width: 100%;
+            font-size: 12px;
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            background: transparent;
+            padding-right: 18px;
+        }
+
+        .items-table input:focus {
+            outline: 1px solid #0056b3;
+            background: #fff;
+        }
+
+        .print-text {
+            display: none;
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            font-weight: bold;
+            color: #000;
+        }
+
+        .summary-section {
+            margin-top: 10px;
+            font-size: 12px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .total-row .total-val {
+            font-size: 16px;
+            margin-left: 10px;
+        }
+
+        .count-summary { font-size: 12px; margin-bottom: 3px; }
+
+        .words-summary {
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            word-wrap: break-word;
+        }
+
+        .notice-block {
+            font-size: 11px;
+            font-style: italic;
+            font-weight: bold;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #000;
+            padding-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .signatures-flex {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            font-size: 13px;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        .sig-item {
+            display: flex;
+            align-items: flex-end;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .sig-line-input {
+            border: none;
+            border-bottom: 1px solid #000;
+            flex: 1;
+            margin-left: 6px;
+            min-width: 50px;
+            padding-right: 18px;
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .btn-panel {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 15px;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .btn-add { background-color: #27ae60; color: white; }
+        .btn-reset { background-color: #e74c3c; color: white; }
+        .btn-print { background-color: #2c3e50; color: white; flex: 1; }
+
+        .btn-remove {
+            background-color: #e74c3c;
+            color: white;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 10mm;
+            }
+
+            body, html {
+                background: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+            }
+
+            .clear-btn, .clear-wrapper {
+                display: block !important;
+            }
+
+            .clear-btn {
+                display: none !important;
+            }
+
+            .clear-wrapper input {
+                display: none !important;
+            }
+
+            .print-text {
+                display: block !important;
+                white-space: normal !important;
+                word-wrap: break-word !important;
+                overflow-wrap: break-word !important;
+                word-break: break-word !important;
+                font-family: 'Arial', 'Helvetica', sans-serif !important;
+                font-size: 13px !important;
+                font-weight: bold !important;
+                color: #000 !important;
+                line-height: 1.2 !important;
+                width: 100% !important;
+            }
+
+            .receipt-card {
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            .header-section {
+                padding-top: 5px !important;
+                padding-right: 0 !important;
+            }
+
+            .title-block {
+                border-bottom: 2px solid #000 !important;
+            }
+
+            .info-container {
+                width: 100% !important;
+            }
+
+            .info-table {
+                width: 100% !important;
+                table-layout: fixed !important;
+            }
+
+            .manager-cell {
+                width: 220px !important;
+                text-align: right !important;
+            }
+
+            .btn-panel, .col-remove, .btn-remove-cell {
+                display: none !important;
+            }
+
+            .table-wrapper {
+                overflow: visible !important;
+                border: none !important;
+                width: 100% !important;
+            }
+
+            table.items-table {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
+                table-layout: fixed !important;
+            }
+
+            .col-num { width: 25px !important; }
+            .col-qty { width: 65px !important; }
+            .col-price { width: 60px !important; }
+            .col-sum { width: 75px !important; }
+
+            table.items-table td {
+                word-wrap: break-word !important;
+                overflow-wrap: break-word !important;
+                word-break: break-word !important;
+            }
+
+            table.items-table td .print-text {
+                font-size: 11px !important;
+                font-weight: normal !important;
+            }
+
+            table.items-table th, 
+            table.items-table td {
+                border: 1px solid #000 !important;
+            }
+
+            .notice-block {
+                border-bottom: 1px solid #000 !important;
+            }
+
+            .signatures-flex {
+                flex-wrap: nowrap !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="receipt-card">
+    <div class="header-section">
+        <div class="title-block">
+            <span class="title-text">Товарный чек №</span> 
+            <div class="clear-wrapper">
+                <input type="text" id="doc-number" value="19053" placeholder="19053" oninput="syncPrintText(this); saveData()">
+                <div class="print-text">19053</div>
+                <span class="clear-btn" onmousedown="clearInput(event, 'doc-number')">✕</span>
+            </div>
+            <span class="title-text">от</span> 
+            <div class="clear-wrapper">
+                <input type="date" id="doc-date" value="2026-04-21" onchange="syncPrintText(this); saveData()">
+                <div class="print-text">2026-04-21</div>
+                <span class="clear-btn" onmousedown="clearInput(event, 'doc-date')">✕</span>
+            </div>
+        </div>
+        <div class="logo-block" style="text-align: right; line-height: 1.1;">
+            <div style="font-size: 26px; font-weight: 900; letter-spacing: 1px;">СНАБЖЕНЕЦ</div>
+            <div style="font-size: 11px; font-weight: normal; color: #333; margin-top: 1px;">ремонт • монтаж • обслуживание</div>
+        </div>
+    </div>
+
+    <div class="info-container">
+        <table class="info-table">
+            <tr>
+                <td class="info-label">Продавец:</td>
+                <td colspan="2">
+                    <div class="clear-wrapper">
+                        <input type="text" class="info-input" id="seller" value="СНАБЖЕНЕЦ Махачкала" placeholder="ФИО / ИП / Компания" oninput="syncPrintText(this); saveData()">
+                        <div class="print-text">СНАБЖЕНЕЦ Махачкала</div>
+                        <span class="clear-btn" onmousedown="clearInput(event, 'seller')">✕</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="info-label">Покупатель:</td>
+                <td>
+                    <div class="clear-wrapper">
+                        <input type="text" class="info-input" id="buyer" value="Газимагомед электрик 89640040355-Z" placeholder="ФИО / Номер телефона" oninput="syncPrintText(this); saveData()">
+                        <div class="print-text">Газимагомед электрик 89640040355-Z</div>
+                        <span class="clear-btn" onmousedown="clearInput(event, 'buyer')">✕</span>
+                    </div>
+                </td>
+                <td class="manager-cell" style="padding-left: 10px;">
+                    <div class="clear-wrapper">
+                        <input type="text" class="manager-input" id="manager" value="Рамазан ст 89640082023" placeholder="Контакт / Менеджер" oninput="syncPrintText(this); checkEmptyManager(); saveData()">
+                        <div class="print-text" style="text-align: right;">Рамазан ст 89640082023</div>
+                        <span class="clear-btn" onmousedown="clearInput(event, 'manager')">✕</span>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="btn-panel" style="margin-bottom: 12px; margin-top: 0;">
+        <button class="btn btn-add" onclick="addRow(); saveData();">+ Добавить товар</button>
+        <button class="btn btn-reset" onclick="resetForm()">Сброс</button>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th class="col-num">№</th>
+                    <th>Товар</th>
+                    <th class="col-qty">Кол-во</th>
+                    <th class="col-price">Цена</th>
+                    <th class="col-sum">Сумма</th>
+                    <th class="col-remove"></th>
+                </tr>
+            </thead>
+            <tbody id="items-body"></tbody>
+        </table>
+    </div>
+
+    <div class="summary-section">
+        <div class="total-row">
+            ИТОГО: <span class="total-val" id="grand-total">0,00</span>
+        </div>
+        <div class="count-summary" id="count-summary-text">
+            Всего наименований 0, на сумму 0,00 руб.
+        </div>
+        <div class="words-summary" id="words-summary-text">
+            Ноль рублей 00 копеек
+        </div>
+    </div>
+
+    <div class="notice-block">
+        Внимание: Возврат товара возможен в течение 14 календарных дней, при условии сохранения товарного вида.<br>
+        Для оформления возврата потребуются паспортные данные!
+    </div>
+
+    <div class="signatures-flex">
+        <div class="sig-item">Отпустил 
+            <div class="clear-wrapper">
+                <input type="text" class="sig-line-input" id="sig-off" oninput="syncPrintText(this)">
+                <div class="print-text"></div>
+                <span class="clear-btn" onmousedown="clearInput(event, 'sig-off')">✕</span>
+            </div>
+        </div>
+        <div class="sig-item">Получил 
+            <div class="clear-wrapper">
+                <input type="text" class="sig-line-input" id="sig-rec" oninput="syncPrintText(this)">
+                <div class="print-text"></div>
+                <span class="clear-btn" onmousedown="clearInput(event, 'sig-rec')">✕</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="btn-panel" style="margin-top: 25px;">
+        <button class="btn btn-print" onclick="window.print()">Распечатать / Сохранить в PDF</button>
+    </div>
+</div>
+
+<script>
+    const STORAGE_KEY = 'novy_svet_receipt_data_v10';
+
+    const defaultReceiptData = {
+        docNumber: '19053',
+        docDate: '2026-04-21',
+        seller: 'СНАБЖЕНЕЦ Махачкала',
+        buyer: 'Газимагомед электрик 89640040355-Z',
+        manager: 'Рамазан ст 89640082023',
+        items: [
+            { name: 'Коробка распределительная СП 100х100х50мм SchE IMT35122(72)', qty: '4', unit: 'шт', price: '82' },
+            { name: 'Распред коробка внутрен. Большая 9.5см черная (150шт)', qty: '8', unit: 'шт', price: '12' },
+            { name: 'Коробка установочная СП 68(65)х45 блочная (200шт)', qty: '41', unit: 'шт', price: '19' },
+            { name: 'Выключатель автоматический модульный 2п С 63А NB1-63 (R) CHINT 179668', qty: '1', unit: 'шт', price: '939' },
+            { name: 'Выключатель автоматический модульный 1п С 20А NB1-63 (R) CHINT 179618', qty: '6', unit: 'шт', price: '429' },
+            { name: 'Реле напряжения Welrok VI-63 Red с контролем тока', qty: '1', unit: 'шт', price: '3237' },
+            { name: 'Корпус пластиковый встраиваемый ЭРА COMFORT ЩРВ-П-12 IP40 прозрачная крышка белый (20)', qty: '1', unit: 'шт', price: '1150' },
+            { name: 'Розетка 1-м ОП Blanca 16A IP20 250В с заземл. без защ. шторок с изолир. пластиной антрацит SchE BLNRA010116', qty: '1', unit: 'шт', price: '302' }
+        ]
+    };
+
+    function syncPrintText(input) {
+        const wrapper = input.closest('.clear-wrapper');
+        if (wrapper) {
+            const printDiv = wrapper.querySelector('.print-text');
+            if (printDiv) {
+                printDiv.innerText = input.value;
+            }
+        }
+    }
+
+    function clearInput(e, target) {
+        e.preventDefault();
+        let input = (typeof target === 'string') ? document.getElementById(target) : target;
+        if (input) {
+            input.value = '';
+            syncPrintText(input);
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            input.focus();
+        }
+    }
+
+    function setupClearButtons() {
+        document.addEventListener('focusin', function(e) {
+            if (e.target.tagName === 'INPUT' && e.target.type !== 'button') {
+                const wrapper = e.target.closest('.clear-wrapper');
+                if (wrapper) {
+                    const btn = wrapper.querySelector('.clear-btn');
+                    if (btn && e.target.value.length > 0) btn.style.display = 'flex';
+                }
+            }
+        });
+
+        document.addEventListener('focusout', function(e) {
+            if (e.target.tagName === 'INPUT') {
+                const wrapper = e.target.closest('.clear-wrapper');
+                if (wrapper) {
+                    const btn = wrapper.querySelector('.clear-btn');
+                    if (btn) btn.style.display = 'none';
+                }
+            }
+        });
+
+        document.addEventListener('input', function(e) {
+            if (e.target.tagName === 'INPUT') {
+                syncPrintText(e.target);
+                const wrapper = e.target.closest('.clear-wrapper');
+                if (wrapper) {
+                    const btn = wrapper.querySelector('.clear-btn');
+                    if (btn) {
+                        btn.style.display = e.target.value.length > 0 ? 'flex' : 'none';
+                    }
+                }
+            }
+        });
+    }
+
+    function checkEmptyManager() {
+        const input = document.getElementById('manager');
+        if (!input.value.trim()) {
+            input.setAttribute('data-empty', 'true');
+        } else {
+            input.removeAttribute('data-empty');
+        }
+    }
+
+    function numberToWordsRubles(num) {
+        const rubles = Math.floor(num);
+        const kopecks = Math.round((num - rubles) * 100);
+        if (rubles === 0) return 'Ноль рублей ' + String(kopecks).padStart(2, '0') + ' копеек';
+
+        const units = ['', 'один', 'два', 'три', 'четыре', 'пять', 'шесть', 'семь', 'восемь', 'девять'];
+        const unitsFem = ['', 'одна', 'две', 'три', 'четыре', 'пять', 'шесть', 'семь', 'восемь', 'девять'];
+        const teens = ['десять', 'одиннадцать', 'двенадцать', 'тринадцать', 'четырнадцать', 'пятнадцать', 'шестнадцать', 'семнадцать', 'восемьнадцать', 'девятнадцать'];
+        const tens = ['', '', 'двадцать', 'тридцать', 'сорок', 'пятьдесят', 'шестьдесят', 'семьдесят', 'восемьдесят', 'девяносто'];
+        const hundreds = ['', 'сто', 'двести', 'триста', 'четыреста', 'пятьсот', 'шестьсот', 'семьсот', 'восемьсот', 'девятьсот'];
+
+        function declension(n, forms) {
+            n = Math.abs(n) % 100;
+            const n1 = n % 10;
+            if (n > 10 && n < 20) return forms[2];
+            if (n1 > 1 && n1 < 5) return forms[1];
+            if (n1 === 1) return forms[0];
+            return forms[2];
+        }
+
+        function convertGroup(n, isFemale) {
+            let result = '';
+            const h = Math.floor(n / 100);
+            const t = Math.floor((n % 100) / 10);
+            const u = n % 10;
+            if (h > 0) result += hundreds[h] + ' ';
+            if (t === 1) {
+                result += teens[u] + ' ';
+            } else {
+                if (t > 0) result += tens[t] + ' ';
+                if (u > 0) result += (isFemale ? unitsFem[u] : units[u]) + ' ';
+            }
+            return result;
+        }
+
+        let str = '';
+        const millions = Math.floor(rubles / 1000000);
+        const thousands = Math.floor((rubles % 1000000) / 1000);
+        const remainder = rubles % 1000;
+
+        if (millions > 0) str += convertGroup(millions, false) + declension(millions, ['миллион', 'миллиона', 'миллионов']) + ' ';
+        if (thousands > 0) str += convertGroup(thousands, true) + declension(thousands, ['тысяча', 'тысячи', 'тысяч']) + ' ';
+        if (remainder > 0) str += convertGroup(remainder, false);
+
+        str = str.trim();
+        str = str.charAt(0).toUpperCase() + str.slice(1);
+
+        const rubWord = declension(rubles, ['рубль', 'рубля', 'рублей']);
+        const kopWord = declension(kopecks, ['копейка', 'копейки', 'копеек']);
+
+        return `${str} ${rubWord} ${String(kopecks).padStart(2, '0')} ${kopWord}`;
+    }
+
+    function updateIndexes() {
+        const rows = document.querySelectorAll('#items-body tr');
+        rows.forEach((row, index) => {
+            row.querySelector('.row-index').innerText = index + 1;
+        });
+    }
+
+    function addRow(name = '', qty = '', unit = 'шт', price = '') {
+        const tbody = document.getElementById('items-body');
+        const row = document.createElement('tr');
+
+        row.innerHTML = `
+            <td class="col-num row-index">1</td>
+            <td>
+                <div class="clear-wrapper">
+                    <input type="text" class="item-name" placeholder="Наименование товара" value="${name}" oninput="syncPrintText(this); calculateRow(this); saveData()">
+                    <div class="print-text">${name}</div>
+                    <span class="clear-btn" onmousedown="clearInput(event, this.previousElementSibling.previousElementSibling)">✕</span>
+                </div>
+            </td>
+            <td class="col-qty">
+                <div style="display:flex; gap:1px;">
+                    <div class="clear-wrapper" style="width:65%;">
+                        <input type="number" class="item-qty" value="${qty}" placeholder="1" min="0.1" step="any" style="text-align:right; padding-right:2px;" oninput="syncPrintText(this); calculateRow(this); saveData()">
+                        <div class="print-text" style="text-align:right;">${qty}</div>
+                    </div>
+                    <div class="clear-wrapper" style="width:35%;">
+                        <input type="text" class="item-unit" value="${unit}" style="text-align:center; padding-right:2px;" oninput="syncPrintText(this); saveData()">
+                        <div class="print-text" style="text-align:center;">${unit}</div>
+                    </div>
+                </div>
+            </td>
+            <td class="col-price">
+                <div class="clear-wrapper">
+                    <input type="number" class="item-price" value="${price}" placeholder="0" min="0" step="0.01" style="text-align:right; padding-right:2px;" oninput="syncPrintText(this); calculateRow(this); saveData()">
+                    <div class="print-text" style="text-align:right;">${price}</div>
+                </div>
+            </td>
+            <td class="col-sum">
+                <div class="clear-wrapper">
+                    <input type="text" class="item-sum" value="0,00" style="text-align:right;" readonly>
+                    <div class="print-text" style="text-align:right;">0,00</div>
+                </div>
+            </td>
+            <td class="col-remove btn-remove-cell">
+                <button class="btn btn-remove" onclick="removeRow(this)">✕</button>
+            </td>
+        `;
+
+        tbody.appendChild(row);
+        updateIndexes();
+        calculateRow(row.querySelector('.item-qty'));
+    }
+
+    function removeRow(button) {
+        button.closest('tr').remove();
+        updateIndexes();
+        calculateTotal();
+        saveData();
+    }
+
+    function calculateRow(input) {
+        const row = input.closest('tr');
+        const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+        const price = parseFloat(row.querySelector('.item-price').value) || 0;
+        const sumInput = row.querySelector('.item-sum');
+        sumInput.value = (qty * price).toFixed(2).replace('.', ',');
+        syncPrintText(sumInput);
+        calculateTotal();
+    }
+
+    function calculateTotal() {
+        const rows = document.querySelectorAll('#items-body tr');
+        let grandTotal = 0;
+        let count = 0;
+
+        rows.forEach(row => {
+            const sumVal = parseFloat(row.querySelector('.item-sum').value.replace(',', '.')) || 0;
+            if (row.querySelector('.item-name').value.trim() !== '' || sumVal > 0) {
+                grandTotal += sumVal;
+                count++;
+            }
+        });
+
+        const formattedTotal = grandTotal.toFixed(2).replace('.', ',');
+        document.getElementById('grand-total').innerText = formattedTotal;
+        document.getElementById('count-summary-text').innerText = `Всего наименований ${count}, на сумму ${formattedTotal} руб.`;
+        document.getElementById('words-summary-text').innerText = numberToWordsRubles(grandTotal);
+    }
+
+    function getFormData() {
+        const rows = document.querySelectorAll('#items-body tr');
+        const items = [];
+        rows.forEach(row => {
+            items.push({
+                name: row.querySelector('.item-name').value,
+                qty: row.querySelector('.item-qty').value,
+                unit: row.querySelector('.item-unit').value,
+                price: row.querySelector('.item-price').value
+            });
+        });
+        return {
+            docNumber: document.getElementById('doc-number').value,
+            docDate: document.getElementById('doc-date').value,
+            seller: document.getElementById('seller').value,
+            buyer: document.getElementById('buyer').value,
+            manager: document.getElementById('manager').value,
+            items: items
+        };
+    }
+
+    function applyFormData(data) {
+        document.getElementById('doc-number').value = data.docNumber || '';
+        document.getElementById('seller').value = data.seller || '';
+        document.getElementById('buyer').value = data.buyer || '';
+        document.getElementById('manager').value = data.manager || '';
+        document.getElementById('doc-date').value = data.docDate || new Date().toISOString().split('T')[0];
+
+        syncPrintText(document.getElementById('doc-number'));
+        syncPrintText(document.getElementById('seller'));
+        syncPrintText(document.getElementById('buyer'));
+        syncPrintText(document.getElementById('manager'));
+        syncPrintText(document.getElementById('doc-date'));
+
+        checkEmptyManager();
+
+        document.getElementById('items-body').innerHTML = '';
+        if (data.items && data.items.length > 0) {
+            data.items.forEach(item => addRow(item.name, item.qty, item.unit || 'шт', item.price));
+        } else {
+            addRow('', '', 'шт', '');
+        }
+        calculateTotal();
+    }
+
+    function saveData() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(getFormData()));
+    }
+
+    function loadData() {
+        setupClearButtons();
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+            try { applyFormData(JSON.parse(saved)); } catch (e) { applyFormData(defaultReceiptData); }
+        } else {
+            applyFormData(defaultReceiptData);
+        }
+    }
+
+    function resetForm() {
+        if (confirm('Очистить список товаров?')) {
+            document.getElementById('doc-number').value = '';
+            document.getElementById('doc-date').valueAsDate = new Date();
+            document.getElementById('manager').value = '';
+            checkEmptyManager();
+            document.getElementById('items-body').innerHTML = '';
+            addRow('', '', 'шт', '');
+            calculateTotal();
+            saveData();
+        }
+    }
+
+    window.onload = loadData;
+</script>
+
+</body>
+</html>
